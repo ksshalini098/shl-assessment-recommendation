@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SHL Assessment Recommender</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 40px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        ul {
+            margin-top: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>SHL Assessment Recommendation</h2>
+
+    <textarea id="query" placeholder="Enter hiring requirement..."></textarea>
+    <br>
+    <button onclick="getRecommendations()">Recommend</button>
+
+    <ul id="results"></ul>
+</div>
+
+<script>
+async function getRecommendations() {
+    const query = document.getElementById("query").value;
+    const resultsList = document.getElementById("results");
+    resultsList.innerHTML = "Loading...";
+
+    const response = await fetch("http://127.0.0.1:8000/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            query: query,
+            top_k: 5
+        })
+    });
+
+    const data = await response.json();
+    resultsList.innerHTML = "";
+
+    data.recommendations.forEach(item => {
+        const li = document.createElement("li");
+        li.innerHTML = `<a href="${item.assessment_url}" target="_blank">
+                        ${item.assessment_name}</a>`;
+        resultsList.appendChild(li);
+    });
+}
+</script>
+
+</body>
+</html>
