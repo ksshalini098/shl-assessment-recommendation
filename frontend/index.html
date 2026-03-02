@@ -67,11 +67,18 @@ async function getRecommendations() {
     resultsList.innerHTML = "";
 
     data.recommendations.forEach(item => {
-        const li = document.createElement("li");
-        li.innerHTML = `<a href="${item.assessment_url}" target="_blank">
-                        ${item.assessment_name}</a>`;
-        resultsList.appendChild(li);
-    });
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+        <strong>${item.name}</strong><br>
+        <small>${item.description}</small><br>
+        <a href="${item.url}" target="_blank">View Assessment</a>
+        <hr>
+    `;
+
+    resultsList.appendChild(li);
+});
+    
 }
 </script>
 

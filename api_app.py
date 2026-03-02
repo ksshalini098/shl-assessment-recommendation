@@ -73,11 +73,14 @@ def recommend_assessments(request: QueryRequest):
     results = []
     for idx in indices[0]:
         results.append({
-            "assessment_name": df.iloc[idx]["assessment_name"],
-            "assessment_url": df.iloc[idx]["assessment_url"]
+            "name": df.iloc[idx]["name"],
+            "url": df.iloc[idx]["url"],
+            "description": df.iloc[idx]["description"]
         })
 
     return {
         "query": query,
         "recommendations": results
     }
+
+    

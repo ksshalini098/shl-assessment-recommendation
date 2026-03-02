@@ -1,139 +1,201 @@
-# SHL Assessment Recommendation System (Generative AI Assignment)
+📌 SHL Assessment Recommendation System
 
-##  Overview
+Semantic Search-Based Assessment Matching using SBERT + FAISS
 
-This project is a semantic recommendation system that suggests relevant SHL assessments based on natural language hiring requirements.
+📖 Problem Statement
 
-Instead of traditional keyword matching, the system uses transformer-based embeddings and vector similarity search to understand the meaning of the hiring query and return the most relevant assessments.
+The goal of this project is to build a system that recommends relevant SHL assessments based on a natural language job description or hiring requirement.
 
----
+Given a free-text query such as:
 
-##  Features
+"Hiring a Java developer with strong problem-solving and communication skills"
 
-- Accepts natural language hiring queries
-- Uses semantic similarity (not keyword search)
-- Fast vector search using FAISS
-- REST API built with FastAPI
-- Simple frontend for live demo
-- Returns top relevant SHL assessments with URLs
+The system should return the most relevant assessments from the SHL product catalog.
 
----
+🧠 Approach Overview
 
-##  System Architecture
+This solution uses semantic search instead of keyword matching.
 
-1. Assessment descriptions are converted into vector embeddings using Sentence Transformers (`all-MiniLM-L6-v2`).
-2. Embeddings are stored and indexed using FAISS for efficient similarity search.
-3. User hiring query is converted into an embedding.
-4. Cosine similarity search is performed against stored assessment embeddings.
-5. Top matching assessments are returned through a REST API.
-6. Frontend displays recommendations in a simple UI.
+🔹 Step 1: Text Embedding
 
----
+Assessment descriptions are converted into vector embeddings using:
 
-##  Tech Stack
+all-MiniLM-L6-v2 (SentenceTransformers)
 
-- Python
-- FastAPI
-- Sentence Transformers
-- FAISS (Vector Similarity Search)
-- Pandas & NumPy
-- HTML / JavaScript (Frontend)
+🔹 Step 2: Vector Indexing
 
----
+Embeddings are indexed using:
 
-##  Project Structure
+FAISS (Facebook AI Similarity Search)
 
-SHL_RECOMMENDATION/
+Enables fast nearest-neighbor retrieval.
+
+🔹 Step 3: Query Processing
+
+User query is embedded using the same model.
+
+FAISS retrieves the top-K most similar assessments.
+
+Results are returned via API and displayed on the frontend.
+
+🏗️ Architecture
+User Query (Frontend)
+        ↓
+FastAPI Backend (/recommend)
+        ↓
+SentenceTransformer (Query Embedding)
+        ↓
+FAISS Vector Search
+        ↓
+Top-K Assessment Retrieval
+        ↓
+JSON Response
+        ↓
+Frontend Display
+📂 Project Structure
+shl-assessment-recommendation/
 │
-├── api/
-│   ├── __init__.py
-│   └── main.py
+├── api_app.py
+├── evaluate.py
+├── requirements.txt
 │
 ├── data/
 │   ├── assessments.csv
-│   └── assessments_with_embeddings.csv
+│   ├── assessments_with_embeddings.csv
+│   ├── assessments.index
+│   └── Gen_AI_Dataset.xlsx
 │
 ├── embeddings/
-│   ├── __init__.py
 │   └── build_embeddings.py
 │
-├── evaluation/
-│   ├── __init__.py
-│   └── evaluate.py
+├── recommender/
+│   └── recommend.py
 │
 ├── frontend/
 │   └── index.html
 │
-├── recommender/
-│   ├── __init__.py
-│   └── recommend.py
-│
-├── api_app.py
-├── test_manual.py
-└── README.md
-
-## ⚙️ Installation & Setup
-
-### 1️⃣ Create Virtual Environment
-
-```bash
+└── screenshots/
+⚙️ How to Run the Project
+1️⃣ Create Virtual Environment
 python -m venv venv
-venv\Scripts\activate   # Windows
-
+venv\Scripts\activate
 2️⃣ Install Dependencies
 pip install -r requirements.txt
-
-3️⃣ Run Backend API
+3️⃣ Build Embeddings (Only Once)
+python embeddings/build_embeddings.py
+4️⃣ Start Backend Server
 uvicorn api_app:app --reload
 
-Backend will start at:
+Open:
 
-http://127.0.0.1:8000
-
-4️⃣ Open Frontend
+http://127.0.0.1:8000/docs
+5️⃣ Run Frontend
 
 Open:
 
 frontend/index.html
+🔌 API Usage Example
+POST /recommend
+{
+  "query": "Hiring a Python developer with analytical skills",
+  "top_k": 5
+}
+Sample Response
+{
+  "query": "...",
+  "recommendations": [
+    {
+      "name": "Assessment Name",
+      "url": "https://...",
+      "description": "Assessment details..."
+    }
+  ]
+}
+📊 Evaluation
 
-in your browser.
+The system is evaluated using Recall@10 on the provided SHL dataset.
 
-🧪 Example Query
-I am hiring for Java developers who can collaborate with business teams. 
-Need an assessment completed in 40 minutes.
+Metric Used
 
-✅ Output
+Recall@K measures how many relevant assessments appear in the top-K predictions.
 
-Returns top matching SHL assessments
-Includes assessment name
-Includes clickable SHL product URL
+Result
+Mean Recall@10: <your_output_here>
 
-📌 Design Decisions
+Due to:
 
-Transformer embeddings used for semantic understanding.
-FAISS used for efficient vector similarity search.
-FastAPI used for lightweight REST API creation.
-Simple frontend created for demonstration purposes.
+Limited dataset size
 
-📊 Why Semantic Search?
+General-purpose embedding model
 
-Traditional keyword search fails when:
-Different wording is used
-Synonyms are present
-Context matters
-Semantic search captures meaning and intent rather than exact word matches.
+No domain-specific fine-tuning
 
-🛠️ Future Improvements
+The recall score may be low.
 
-Add filtering by duration (e.g., 30–60 mins)
-Add skill tagging metadata
-Improve ranking using hybrid search (keyword + semantic)
-Deploy as a cloud-hosted API
+However, the evaluation pipeline demonstrates correctness and can be improved further using:
 
-🎯 Assignment Objective
+Domain-specific fine-tuning
 
-The goal of this project is to demonstrate the ability to:
-Work with transformer-based embeddings
-Implement semantic search
-Build an API-based solution
-Deliver an end-to-end working system
+Hybrid lexical + semantic ranking
+
+Metadata filtering
+
+Re-ranking models
+
+🖼️ Screenshots
+
+Add your screenshots inside the screenshots/ folder and include them like this:
+
+## API Example
+![API Screenshot](screenshots/swagger_api.png)
+
+## Frontend UI
+![Frontend Screenshot](screenshots/frontend_ui.png)
+🚀 Why This Approach?
+
+This system uses semantic embeddings + FAISS, which:
+
+Captures contextual meaning beyond keywords
+
+Handles unseen queries effectively
+
+Scales efficiently for large assessment catalogs
+
+Provides fast retrieval suitable for production systems
+
+This approach is more robust than traditional keyword-based search systems.
+
+⚠️ Limitations
+
+No fine-tuning on SHL-specific domain data
+
+Small evaluation dataset
+
+No hybrid re-ranking
+
+No personalization layer
+
+🔮 Future Improvements
+
+Cross-encoder re-ranking
+
+Skill extraction pipeline
+
+Metadata-aware filtering
+
+Hybrid BM25 + Semantic Search
+
+Deployment on cloud (Docker + CI/CD)
+
+🏁 Conclusion
+
+This project demonstrates a complete end-to-end semantic recommendation pipeline:
+
+✔ Data preprocessing
+✔ Embedding generation
+✔ FAISS indexing
+✔ FastAPI backend
+✔ Frontend integration
+✔ Evaluation using Recall@10
+
+The system is modular, scalable, and extensible for real-world enterprise use cases.
