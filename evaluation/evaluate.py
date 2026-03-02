@@ -1,29 +1,36 @@
 import pandas as pd
-from recommender.recommend import recommend_assessments
+import sys
+import os
 
-# Load train dataset
-df = pd.read_excel("data/Gen_AI_Dataset.xlsx")
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-def recall_at_k(predicted, actual, k=10):
-    predicted_k = predicted[:k]
-    hits = len(set(predicted_k) & set(actual))
-    return hits / len(actual) if len(actual) > 0 else 0
+from recommender.recommender import recommend_assessments
 
-recalls = []
 
-for _, row in df.iterrows():
-    query = row["query"]
+# Load test dataset
+df = pd.read_excel("data/test_dataset.xlsx")
 
-    # actual URLs (comma-separated)
-    actual_urls = [url.strip() for url in row["assessment_url"].split(",")]
+# Change column name if needed
+query_column = df.columns[0]
 
-    # model predictions
-    results = recommend_assessments(query, top_k=20)
-    predicted_urls = [r["assessment_url"] for r in results]
+queries = df[query_column].tolist()
 
-    r_at_10 = recall_at_k(predicted_urls, actual_urls, 10)
-    recalls.append(r_at_10)
+output = []
 
-mean_recall_10 = sum(recalls) / len(recalls)
+for query in queries:
 
-print("✅ Mean Recall@10:", round(mean_recall_10, 4))
+    results = recommend_assessments(query, top_k=10)
+
+    for r in results:
+
+        output.append({
+            "Query": query,
+            "Assessment_url": r["assessment_url"]
+        })
+
+# Save submission file
+submission_df = pd.DataFrame(output)
+
+submission_df.to_csv("evaluation/evaluate.csv", index=False)
+
+print("Submission file generated successfully")
