@@ -1,29 +1,26 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from api.schemas import QueryRequest
 from recommender.recommender import recommend_assessments
 
-app = FastAPI(title="SHL Assessment Recommendation API")
+import os
+import uvicorn
 
-# Request model
-class QueryRequest(BaseModel):
-    query: str
+app = FastAPI()
 
+@app.get("/")
+def home():
+    return {"message": "SHL Recommendation API running"}
 
-# Health endpoint (MANDATORY for SHL)
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
-
-# Recommendation endpoint (MANDATORY for SHL)
 @app.post("/recommend")
 def recommend(request: QueryRequest):
+    results = recommend_assessments(request.query)
+    return {"recommendations": results}
 
-    query = request.query
 
-    results = recommend_assessments(query, top_k=10)
-
-    return {
-        "query": query,
-        "recommendations": results
-    }
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run("api.main:app", host="0.0.0.0", port=port)
