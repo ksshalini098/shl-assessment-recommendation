@@ -11,7 +11,7 @@ df.columns = df.columns.str.strip().str.lower()
 index = faiss.read_index("data/assessments.index")
 
 # Load embedding model
-model = SentenceTransformer("all-MiniLM-L6-v2")
+model = SentenceTransformer("paraphrase-MiniLM-L3-v2")
 
 def recommend_assessments(query, top_k=10):
     """
