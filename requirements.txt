@@ -1,8 +1,9 @@
 fastapi
 uvicorn
 sentence-transformers
-faiss-cpu==1.13.2
+faiss-cpu
 pandas
 numpy
-scikit-learn
+openpyxl
+python-multipart
 torch
